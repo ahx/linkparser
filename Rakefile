@@ -47,7 +47,6 @@ require 'rake'
 require 'rake/testtask'
 require 'rake/packagetask'
 require 'rake/clean'
-# require 'rake/191_compat.rb'
 
 $dryrun = false
 
@@ -104,8 +103,8 @@ TESTDIR       = BASEDIR + 'tests'
 TEST_FILES    = Rake::FileList.new( "#{TESTDIR}/**/*.tests.rb" )
 
 RAKE_TASKDIR  = BASEDIR + 'rake'
+PKG_TASKLIBS  = Rake::FileList.new( "#{RAKE_TASKDIR}/{documentation,helpers,packaging,testing}.rb" )
 RAKE_TASKLIBS = Rake::FileList.new( "#{RAKE_TASKDIR}/*.rb" )
-PKG_TASKLIBS  = Rake::FileList.new( "#{RAKE_TASKDIR}/{191_compat,helpers,packaging,rdoc,testing}.rb" )
 PKG_TASKLIBS.include( "#{RAKE_TASKDIR}/manual.rb" ) if MANUALDIR.exist?
 
 RAKE_TASKLIBS_URL = 'http://repo.deveiate.org/rake-tasklibs'
@@ -152,14 +151,15 @@ if !RAKE_TASKDIR.exist?
 		$stderr.puts "Okay, fetching #{RAKE_TASKLIBS_URL} into #{RAKE_TASKDIR}..."
 		system 'hg', 'clone', RAKE_TASKLIBS_URL, "./#{RAKE_TASKDIR}"
 		if ! $?.success?
-			fail "Damn. That didn't work. Giving up; maybe try manually fetching?"
+			fail "Damn. That didn't work. Giving up; maybe try manually fetching?" +
+			  "If you don't have Mercurial installed, you might want to try the Git mirror: https://github.com/ged/geds-rake-tasklibs"
 		end
 	else
 		$stderr.puts "Then I'm afraid I can't continue. Best of luck."
 		fail "Rake tasklibs not present."
 	end
 
-	RAKE_TASKLIBS.include( "#{RAKE_TASKDIR}/*.rb" )
+  RAKE_TASKLIBS.include( "#{RAKE_TASKDIR}/*.rb" )
 end
 
 require RAKE_TASKDIR + 'helpers.rb'
@@ -214,11 +214,12 @@ DEPENDENCIES = {
 # Developer Gem dependencies: gemname => version
 DEVELOPMENT_DEPENDENCIES = {
 	'rake'         => '>= 0.8.7',
+	'rake-compiler' => '~> 0.7.1',
 	'rcodetools'   => '>= 0.7.0.0',
 	'rcov'         => '>= 0.8.1.2.0',
 	'rdoc'         => '>= 2.4.3',
 	'RedCloth'     => '>= 4.0.3',
-	'rspec'        => '>= 1.2.6',
+	'rspec'        => '~> 1.2.6',
 	'ruby-termios' => '>= 0.9.6',
 	'text-format'  => '>= 1.0.0',
 	'tmail'        => '>= 1.2.3.1',
@@ -230,49 +231,8 @@ REQUIREMENTS = {
 	'link-grammar' => '>= 4.4.3',
 }
 
-# RubyGem specification
-GEMSPEC   = Gem::Specification.new do |gem|
-	gem.name              = PKG_NAME.downcase
-	gem.version           = PKG_VERSION
-
-	gem.summary           = PKG_SUMMARY
-	gem.description       = [
-		"A Ruby binding for the link-grammar library, a syntactic parser",
-		"of English. See http://www.link.cs.cmu.edu/link/ for more",
-		"information about the Link Grammar, and",
-		"http://www.abisource.org/projects/link-grammar/ for information",
-		"about the link-grammar library.",
-  	  ].join( "\n" )
-
-	gem.authors           = "Martin Chase, Michael Granger"
-	gem.email             = ["stillflame@FaerieMUD.org", "ged@FaerieMUD.org"]
-	gem.homepage          = 'http://deveiate.org/projects/Ruby-LinkParser/'
-
-	gem.has_rdoc          = true
-	gem.rdoc_options      = RDOC_OPTIONS
-	gem.extra_rdoc_files  = TEXT_FILES - [ 'Rakefile' ]
-
-	gem.bindir            = BINDIR.relative_path_from(BASEDIR).to_s
-	gem.executables       = BIN_FILES.select {|pn| File.executable?(pn) }.
-	                            collect {|pn| File.basename(pn) }
-	gem.require_paths << EXTDIR.relative_path_from( BASEDIR ).to_s if EXTDIR.exist?
-
-	if EXTCONF.exist?
-		gem.extensions << EXTCONF.relative_path_from( BASEDIR ).to_s
-	end
-
-	gem.files             = RELEASE_FILES
-	gem.test_files        = SPEC_FILES
-
-	DEPENDENCIES.each do |name, version|
-		version = '>= 0' if version.length.zero?
-		gem.add_runtime_dependency( name, version )
-	end
-
-	REQUIREMENTS.each do |name, version|
-		gem.requirements << [ name, version ].compact.join(' ')
-	end
-end
+# Load RubyGem specification
+GEMSPEC = eval(File.read(BASEDIR + "#{PKG_NAME}.gemspec"))
 
 $trace = Rake.application.options.trace ? true : false
 $dryrun = Rake.application.options.dryrun ? true : false
