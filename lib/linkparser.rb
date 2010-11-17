@@ -24,9 +24,7 @@ module LinkParser
 
 	require 'linkparser/sentence'
 	require 'linkparser/linkage'
-
-	# Release version
-	VERSION = '1.0.6'
+	require 'linkparser/version'
 
 end # class LinkParser
 
