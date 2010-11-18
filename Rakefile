@@ -240,7 +240,7 @@ CLEAN.include 'coverage', '**/*.orig', '**/*.rej'
 CLOBBER.include 'artifacts', 'coverage.info', 'ChangeLog', PKGDIR
 
 ### Task: changelog
-file 'ChangeLog' do |task|
+file 'ChangeLog' do |task|  
 	log "Updating #{task.name}"
 
 	changelog = make_changelog()
@@ -248,6 +248,7 @@ file 'ChangeLog' do |task|
 		fh.print( changelog )
 	end
 end
+
 
 
 ### Task: cruise (Cruisecontrol task)

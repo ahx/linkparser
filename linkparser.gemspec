@@ -39,7 +39,7 @@ Gem::Specification.new do |gem|
   ].each {|file| gem.files << file if File.exist?(file) }
   
   # Essential rake tasks
-  gem.files << Rake::FileList.new("#rake/{documentation,helpers,packaging,testing}.rb")  	                                        
+  gem.files << Rake::FileList.new("#rake/{documentation,helpers,hg,packaging,testing}.rb")  	                                        
 
   # Development-Dependencies 
   {
