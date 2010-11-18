@@ -41,8 +41,7 @@ Gem::Specification.new do |gem|
   # Essential rake tasks
   gem.files << Rake::FileList.new("#rake/{documentation,helpers,packaging,testing}.rb")  	                                        
 
-  # Dependencies 
-  # TODO Differentiate between runtime and developement dependencies
+  # Development-Dependencies 
   {
   	'rake'         => '>= 0.8.7',
   	'rake-compiler' => '~> 0.7.1',
@@ -56,7 +55,7 @@ Gem::Specification.new do |gem|
   	'tmail'        => '>= 1.2.3.1',
   	'diff-lcs'     => '>= 1.1.2'
   }.each do |name, version|
-		gem.add_runtime_dependency( name, version )
+		gem.add_development_dependency( name, version )
 	end
 
 	gem.requirements << 'link-grammar >= 4.4.3'

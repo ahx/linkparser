@@ -52,6 +52,14 @@ $dryrun = false
 
 ### Config constants
 BASEDIR       = Pathname.new( __FILE__ ).dirname.relative_path_from( Pathname.getwd )
+
+PROJECT_NAME  = 'LinkParser'
+# Load RubyGem specification
+GEMSPEC = eval(File.read(BASEDIR + "linkparser.gemspec"))
+
+PKG_NAME      = GEMSPEC.name
+PKG_SUMMARY   = 'a Ruby binding for the link-grammar library'
+
 BINDIR        = BASEDIR + 'bin'
 LIBDIR        = BASEDIR + 'lib'
 EXTDIR        = BASEDIR + 'ext'
@@ -60,10 +68,6 @@ PKGDIR        = BASEDIR + 'pkg'
 DATADIR       = BASEDIR + 'data'
 
 MANUALDIR     = DOCSDIR + 'manual'
-
-PROJECT_NAME  = 'LinkParser'
-PKG_NAME      = PROJECT_NAME.downcase
-PKG_SUMMARY   = 'a Ruby binding for the link-grammar library'
 
 # Cruisecontrol stuff
 CC_BUILD_LABEL     = ENV['CC_BUILD_LABEL']
@@ -85,27 +89,21 @@ COMMIT_MSG_FILE = 'commit-msg.txt'
 FILE_INDENT     = " " * 12
 LOG_INDENT      = " " * 3
 
-EXTCONF       = EXTDIR + 'extconf.rb'
-
 ARTIFACTS_DIR = Pathname.new( CC_BUILD_ARTIFACTS )
 
-TEXT_FILES    = Rake::FileList.new( %w[Rakefile ChangeLog README* LICENSE] )
 BIN_FILES     = Rake::FileList.new( "#{BINDIR}/*" )
 LIB_FILES     = Rake::FileList.new( "#{LIBDIR}/**/*.rb" )
 EXT_FILES     = Rake::FileList.new( "#{EXTDIR}/**/*.{c,h,rb}" )
 DATA_FILES    = Rake::FileList.new( "#{DATADIR}/**/*" )
 
 SPECDIR       = BASEDIR + 'spec'
-SPECLIBDIR    = SPECDIR + 'lib'
-SPEC_FILES    = Rake::FileList.new( "#{SPECDIR}/**/*_spec.rb", "#{SPECLIBDIR}/**/*.rb" )
+SPEC_FILES    = Rake::FileList.new( "#{SPECDIR}/**/*_spec.rb", "#{SPECDIR}/lib/**/*.rb" )
 
 TESTDIR       = BASEDIR + 'tests'
 TEST_FILES    = Rake::FileList.new( "#{TESTDIR}/**/*.tests.rb" )
 
 RAKE_TASKDIR  = BASEDIR + 'rake'
-PKG_TASKLIBS  = Rake::FileList.new( "#{RAKE_TASKDIR}/{documentation,helpers,packaging,testing}.rb" )
 RAKE_TASKLIBS = Rake::FileList.new( "#{RAKE_TASKDIR}/*.rb" )
-PKG_TASKLIBS.include( "#{RAKE_TASKDIR}/manual.rb" ) if MANUALDIR.exist?
 
 RAKE_TASKLIBS_URL = 'http://repo.deveiate.org/rake-tasklibs'
 
@@ -113,18 +111,7 @@ LOCAL_RAKEFILE = BASEDIR + 'Rakefile.local'
 
 EXTRA_PKGFILES = Rake::FileList.new
 
-RELEASE_FILES = TEXT_FILES + 
-	SPEC_FILES + 
-	TEST_FILES + 
-	BIN_FILES +
-	LIB_FILES + 
-	EXT_FILES + 
-	DATA_FILES + 
-	RAKE_TASKLIBS +
-	EXTRA_PKGFILES
-
-
-RELEASE_FILES << LOCAL_RAKEFILE.to_s if LOCAL_RAKEFILE.exist?
+RELEASE_FILES = GEMSPEC.test_files + GEMSPEC.files
 
 RELEASE_ANNOUNCE_ADDRESSES = [
 	"Ruby-Talk List <ruby-talk@ruby-lang.org>",
@@ -177,7 +164,7 @@ SNAPSHOT_GEM_NAME = "#{SNAPSHOT_PKG_NAME}.gem"
 
 # Documentation constants
 API_DOCSDIR = DOCSDIR + 'api'
-README_FILE = TEXT_FILES.find {|path| path =~ /^README/ } || 'README'
+README_FILE = 'README'
 RDOC_OPTIONS = [
 	'--tab-width=4',
 	'--show-hash',
@@ -208,31 +195,10 @@ PROJECT_SCPPUBURL = "#{PROJECT_HOST}:#{PROJECT_PUBDIR}"
 PROJECT_SCPDOCURL = "#{PROJECT_HOST}:#{PROJECT_DOCDIR}"
 
 # Gem dependencies: gemname => version
-DEPENDENCIES = {
-}
+DEPENDENCIES = Hash[GEMSPEC.runtime_dependencies.map{ |gem| [ gem.name, gem.requirement.to_s ]  }]
 
 # Developer Gem dependencies: gemname => version
-DEVELOPMENT_DEPENDENCIES = {
-	'rake'         => '>= 0.8.7',
-	'rake-compiler' => '~> 0.7.1',
-	'rcodetools'   => '>= 0.7.0.0',
-	'rcov'         => '>= 0.8.1.2.0',
-	'rdoc'         => '>= 2.4.3',
-	'RedCloth'     => '>= 4.0.3',
-	'rspec'        => '~> 1.2.6',
-	'ruby-termios' => '>= 0.9.6',
-	'text-format'  => '>= 1.0.0',
-	'tmail'        => '>= 1.2.3.1',
-	'diff-lcs'     => '>= 1.1.2',
-}
-
-# Non-gem requirements: packagename => version
-REQUIREMENTS = {
-	'link-grammar' => '>= 4.4.3',
-}
-
-# Load RubyGem specification
-GEMSPEC = eval(File.read(BASEDIR + "#{PKG_NAME}.gemspec"))
+DEVELOPMENT_DEPENDENCIES = Hash[GEMSPEC.development_dependencies.map{ |gem| [ gem.name, gem.requirement.to_s ]  }]
 
 $trace = Rake.application.options.trace ? true : false
 $dryrun = Rake.application.options.dryrun ? true : false
