@@ -17,7 +17,7 @@ BEGIN {
 	$LOAD_PATH.unshift( extdir.to_s ) unless $LOAD_PATH.include?( extdir.to_s )
 }
 
-require 'spec/runner'
+# require 'spec/runner'
 require 'linkparser'
 
 
