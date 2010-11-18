@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
 require 'rake'
-require 'linkparser/version'
+require File.expand_path("../lib/linkparser/version", __FILE__)
 
 Gem::Specification.new do |gem|
 	gem.name              = "linkparser"
@@ -39,7 +38,7 @@ Gem::Specification.new do |gem|
   ].each {|file| gem.files << file if File.exist?(file) }
   
   # Essential rake tasks
-  gem.files << Rake::FileList.new("#rake/{documentation,helpers,hg,packaging,testing}.rb")  	                                        
+  gem.files + Rake::FileList.new("#rake/{documentation,helpers,hg,packaging,testing}.rb")  	                                        
 
   # Development-Dependencies 
   {
