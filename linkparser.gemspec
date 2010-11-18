@@ -21,7 +21,6 @@ Gem::Specification.new do |gem|
 
 	gem.has_rdoc          = true
 	gem.extra_rdoc_files  = Rake::FileList.new(%w[ChangeLog README* LICENSE]).to_a
-	gem.require_paths    << 'ext'
 	gem.extensions       << 'ext/extconf.rb'
 	                                          
 	gem.test_files        = Rake::FileList.new("spec/**/*_spec.rb", "spec/lib/**/*.rb").to_a
